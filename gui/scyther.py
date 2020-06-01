@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 	Scyther : An automatic verifier for security protocols.
 	Copyright (C) 2007-2013 Cas Cremers
@@ -50,8 +50,8 @@ def simpleRun(args):
 if __name__ == '__main__':
     pars = sys.argv[1:]
     if len(pars) == 0:
-        print usage()
+        print(usage())
     else:
-        print simpleRun(" ".join(pars))
+        print(simpleRun(" ".join(pars)))
 
 

@@ -34,8 +34,8 @@ from Scyther import Misc as MiscScyther
 from Scyther import FindDot
 
 """ Import scyther-gui components """
-import Temporary
-import Preference
+from . import Temporary
+from . import Preference
 
 #---------------------------------------------------------------------------
 try:
@@ -53,7 +53,7 @@ def writeGraph(attackthread,txt,fp):
     ALL = 3
 
     def graphLine(txt):
-        fp.write("\t%s;\n" % (txt))
+        fp.write(("\t%s;\n" % (txt)).encode('utf-8'))
 
     def setAttr(atxt,EdgeNodeDefAll=ALL):
         if EdgeNodeDefAll == ALL:
@@ -81,7 +81,7 @@ def writeGraph(attackthread,txt,fp):
 
     # write all graph lines but add layout modifiers
     for l in txt.splitlines():
-        fp.write(l)
+        fp.write(l.encode('utf-8'))
         if l.startswith("digraph"):
             # Write additional stuff for this graph
             #
@@ -118,11 +118,11 @@ def makeImageDot(dotdata,attackthread=None):
     if Preference.usePIL():
         # If we have the PIL library, we can do postscript! great
         # stuff.
-        type = "ps"
+        ftype = "ps"
         ext = ".ps"
     else:
         # Ye olde pnge file
-        type = "png"
+        ftype = "png"
         ext = ".png"
 
     # Retrieve dot command path
@@ -130,14 +130,14 @@ def makeImageDot(dotdata,attackthread=None):
 
     # command to write to temporary file
     (fd2,fpname2) = Temporary.tempcleaned(ext)
-    f = os.fdopen(fd2,'w')
+    # Close it immediately, but we want the name (need to clean ourselves)
+    os.close(fd2)
 
     # Set up command
-    cmd = "%s -T%s" % (dotcommand,type)
+    cmd = "%s -T%s -o%s" % (dotcommand,ftype,fpname2)
 
     # execute command
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE)
-
 
     if attackthread:
         writeGraph(attackthread,dotdata,p.stdin)
@@ -145,15 +145,9 @@ def makeImageDot(dotdata,attackthread=None):
         p.stdin.write(dotdata)
 
     p.stdin.close()
-
-    for l in p.stdout.read():
-        f.write(l)
-
     p.stdout.close()
-    f.flush()
-    f.close()
 
-    return (fpname2, type)
+    return (fpname2, ftype)
 
 
 def makeImage(attack,attackthread=None):
@@ -161,10 +155,10 @@ def makeImage(attack,attackthread=None):
 
     """ This should clearly be a method of 'attack' """
 
-    (name,type) = makeImageDot(attack.scytherDot,attackthread)
+    (name,ftype) = makeImageDot(attack.scytherDot,attackthread)
     # if this is done, store and report
     attack.file = name
-    attack.filetype = type
+    attack.filetype = ftype
 
 
 def testImage():

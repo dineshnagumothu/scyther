@@ -29,7 +29,7 @@ import sys
 import os
 #---------------------------------------------------------------------------
 """ Import internals """
-import Misc
+from . import Misc
 #---------------------------------------------------------------------------
 
 DOTLOCATION = None
@@ -41,8 +41,11 @@ def testDot(fpath):
     try:
         cmd = "%s -V" % (fpath)
         (sts,sout,serr) = Misc.safeCommandOutput(cmd)
+        print (sts)
+        print (sout)
+        print (serr)
         if sts != -1:
-            if "version" in sout + serr:
+            if "version" in str(sout + serr):
                 return True
     except:
         pass

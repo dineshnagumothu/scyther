@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from __future__ import division # 2.2+-only
 """
 	Scyther : An automatic verifier for security protocols.
 	Copyright (C) 2007-2013 Cas Cremers
@@ -25,14 +24,14 @@ from __future__ import division # 2.2+-only
 """ Import externals """
 import wx
 import os
-from Misc import *
+from .Misc import *
 
 #---------------------------------------------------------------------------
 
 """ Import scyther-gui components """
-import Icon
-import Preference
-import Error
+from . import Icon
+from . import Preference
+from . import Error
 
 #---------------------------------------------------------------------------
 try:
@@ -74,7 +73,7 @@ class AttackDisplay(wx.ScrolledWindow):
                 Preference.doNotUsePIL()
                 raise Error.PILError
         else:
-            print "Unknown file type %s." % (self.filetype)
+            print("Unknown file type %s." % (self.filetype))
 
         # TODO self.Bind(wxSizeEvent
         self.update(True)
@@ -142,7 +141,7 @@ class AttackDisplay(wx.ScrolledWindow):
             self.Image.SetBitmap(image.ConvertToBitmap())
 
         else:
-            print "Unknown file type %s." % (self.attack.filetype)
+            print("Unknown file type %s." % (self.attack.filetype))
 
         self.SetVirtualSize((virtualwidth,virtualheight))
 

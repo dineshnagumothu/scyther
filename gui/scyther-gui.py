@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 """
 	Scyther : An automatic verifier for security protocols.
 	Copyright (C) 2007-2013 Cas Cremers
@@ -23,7 +23,7 @@
 # Try to get wxPython
 try:
     import wx.adv
-except ImportError,err:
+except ImportError as err:
     from Scyther import Misc
 
     errmsg = "Problem with importing the required [wxPython] package."
@@ -193,7 +193,7 @@ class ScytherApp(wx.App):
 
         # License option may abort here
         if opts.license:
-            print Scyther.GetLicense()
+            print(Scyther.GetLicense())
             sys.exit(0)
 
         # Load preferences file

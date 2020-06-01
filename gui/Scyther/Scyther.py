@@ -28,7 +28,7 @@
 import os
 import os.path
 import sys
-import StringIO
+import io
 import tempfile
 try:
     import hashlib
@@ -40,10 +40,10 @@ except ImportError:
 #---------------------------------------------------------------------------
 
 """ Import scyther components """
-import XMLReader
-import Error
-import Claim
-from Misc import *
+from . import XMLReader
+from . import Error
+from . import Claim
+from .Misc import *
 
 #---------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ def getCacheDir():
 
     # Check if user chose the path
     cachedirkey = "SCYTHERCACHEDIR"
-    if cachedirkey in os.environ.keys():
+    if cachedirkey in list(os.environ.keys()):
         tmpdir = os.environ[cachedirkey]
         if tmpdir == "":
             # Special value: if the variable is present, but equals the empty string, we disable caching.
@@ -126,7 +126,7 @@ def CheckSanity(program):
     """
 
     if not os.path.isfile(program):
-        raise Error.BinaryError, program
+        raise Error.BinaryError(program)
 
 #---------------------------------------------------------------------------
 
@@ -149,7 +149,7 @@ def EnsureString(x,sep=" "):
         return sep.join(newlist)
 
     else:
-        raise Error.StringListError, x
+        raise Error.StringListError(x)
 
 
 #---------------------------------------------------------------------------
@@ -177,7 +177,7 @@ def getScytherBackend():
     else:
 
         """ Unsupported"""
-        raise Error.UnknownPlatformError, sys.platform
+        raise Error.UnknownPlatformError(sys.platform)
 
     program = os.path.join(getBinDir(),scythername)
     return program
@@ -295,13 +295,13 @@ class Scyther(object):
         # Apparently we are supporsed to be able to use the cache
         m = hashlib.sha256()
         if spdl == None:
-            m.update("[spdl:None]")
+            m.update("[spdl:None]".encode('utf-8'))
         else:
-            m.update(spdl)
+            m.update(spdl.encode('utf-8'))
         if args == None:
-            m.update("[args:None]")
+            m.update("[args:None]".encode('utf-8'))
         else:
-            m.update(args)
+            m.update(args.encode('utf-8'))
 
         uid = m.hexdigest()
 
@@ -354,11 +354,11 @@ class Scyther(object):
             ensurePath(path)
 
             fh1 = open(fname1,"w")
-            fh1.write(out)
+            fh1.write(out.encode('utf-8'))
             fh1.close()
 
             fh2 = open(fname2,"w")
-            fh2.write(err)
+            fh2.write(err.encode('utf-8'))
             fh2.close()
         except:
             pass
@@ -400,7 +400,7 @@ class Scyther(object):
 
             # Write (input) file
             fhi = os.fdopen(fdi,'w+b')
-            fhi.write(spdl)
+            fhi.write(spdl.encode('utf-8'))
             fhi.close()
 
         # Generate command line for the Scyther process
@@ -495,7 +495,7 @@ class Scyther(object):
                     # whoohee, xml
                     self.validxml = True
 
-                    xmlfile = StringIO.StringIO(output)
+                    xmlfile = io.StringIO(output)
                     reader = XMLReader.XMLReader()
                     self.claims = reader.readXML(xmlfile)
 
@@ -595,10 +595,10 @@ def FindProtocols(path="",filterProtocol=None):
     Note: Unix only! Will not work under windows.
     """
 
-    import commands
+    import subprocess
 
     cmd = "find %s -iname '*.spdl'" % (path)
-    plist = commands.getoutput(cmd).splitlines()
+    plist = subprocess.getoutput(cmd).splitlines()
     nlist = []
     for prot in plist:
         if filterProtocol != None:
